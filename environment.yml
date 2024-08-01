@@ -1,0 +1,38 @@
+name: image_analysis_env
+channels:
+  - apple
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - scikit-image
+  - pillow
+  - jupyterlab
+  - opencv
+  - ipywidgets
+  - tqdm
+  - pytorch
+  - torchvision
+  - "tensorflow>=2.11"  # Ensure compatibility with macOS and M1/M2 chips
+  - h5py
+  - pyyaml
+  - requests
+  - seaborn
+  - pip
+  - pip:
+      - albumentations
+      - imgaug
+      - onnx
+      - onnxruntime
+      - keras
+      - matplotlib-inline
+      - tensorflow-metal  # Optimizes TensorFlow on Apple Silicon GPUs
+      - jupyterlab
+      - tensorflow-datasets
+      - ipykernel
