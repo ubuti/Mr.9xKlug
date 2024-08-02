@@ -29,7 +29,7 @@ If you want to run the model locally:
 
 - Architecture: torchvision.models.resnet18 was used and initialised with the weights and configuration of [BehradG](https://huggingface.co/BehradG/resnet-18-finetuned-MRI-Brain/tree/main).
 - Training Data: Two datasets available via *kaggle* [1](https://www.kaggle.com/datasets/sartajbhuvaji/brain-tumor-classification-mri) [2](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset) where joined.
-- Performance: Model exceeds $98%$ accuracy.
+- Performance: Model exceeds $97%$ accuracy.
 
 ### Contact
 
