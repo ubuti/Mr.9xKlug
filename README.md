@@ -28,7 +28,7 @@ Try out the model with our interactive demo:
 If you want to run the model locally:
 
 1. Clone this repository
-2. Install dependencies: `conda env create -f environment.yml`
+2. Install dependencies: `conda env create -f environment.yml`. Alternatively use `pip install requirements.txt`.
 3. Run the Gradio interface: `python/python3 -u app.py`
 
 ### Model Details
