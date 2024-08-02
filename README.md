@@ -1,3 +1,9 @@
+---
+title: MRI_tumor_classification
+app_file: app.py
+sdk: gradio
+sdk_version: 4.40.0
+---
 # Mr.9xKlug
 
 ## MRI Tumor Classification Model
