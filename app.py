@@ -1,64 +1,77 @@
-import matplotlib.pyplot as plt
-from PIL import Image
-import random
-import os
-import gradio as gr
 import torch
-from torchvision import transforms, models
+import gradio as gr
+from PIL import Image
+import torch.nn as nn
+from torchvision import models
+import torchvision.transforms as transforms
+import os
 
-# Load the trained model
+# Initialize the model
 model = models.resnet18()
-model.load_state_dict(torch.load('Models/resnet18/resnet_mri_010824.pth'))
+model.fc = nn.Linear(model.fc.in_features, 4)
+
+# Load the state dictionary from the .pt file
+state_dict = torch.load(
+    './Models/resnet18/resnet_mri_010824.pth', map_location=torch.device('cpu'))
+model.load_state_dict(state_dict)
 model.eval()
 
-# Define prediction functions
+# Define the device
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+model = model.to(device)
+
+# Define the transformation
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+])
 
 
-def predict_mri(image, mode):
-    # Preprocess the image
-    preprocess = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[-1.3006, -1.2001, -0.9724], std=[0.8727, 0.8922, 0.8884]),
-    ])
-    input_tensor = preprocess(image).unsqueeze(0)
+def predict_mri(image):
+    # Convert to RGB (in case the input is grayscale)
+    image = image.convert("RGB")
+
+    # Transform the image
+    image_tensor = transform(image).unsqueeze(0).to(device)
 
     # Make prediction
     with torch.no_grad():
-        output = model(input_tensor)
+        logits = model(image_tensor)
+        probabilities = torch.softmax(logits, dim=1)
 
-    # Process the output based on the selected mode
-    probability = torch.nn.functional.softmax(output[0], dim=0)
-    if mode == "Binary Classification":
-        result = {
-            "No tumor": float(probability[0]),
-            "Tumor": float(probability[1])
-        }
-    else:  # Multi-class classification
-        result = {
-            "No Tumor": float(probability[0]),
-            "Glioma": float(probability[1]),
-            "Meningioma": float(probability[2]),
-            "Pituitary": float(probability[3])
-        }
-    return image, result
+    # Get the predicted class and probability
+    _, predicted = torch.max(probabilities, 1)
+    pred_class = predicted.item()
+    pred_prob = probabilities[0, pred_class].item()
+
+    # Define class labels
+    class_labels = ["No Tumor", "Glioma", "Meningioma", "Pituitary"]
+
+    # Create result dictionary
+    result = {label: float(prob) for label, prob in zip(
+        class_labels, probabilities[0].tolist())}
+
+    return result
 
 
-# Set the directory path
-directory = "./Data/Datasets"
-
-# Get a list of all .jpg files in the directory
-file_list = [os.path.join(directory, file)
-             for file in os.listdir(directory) if file.endswith(".jpg")]
+# Set up example images
+directory = "./Data/"
+file_list = []
+for root, dirs, files in os.walk(directory):
+    for file in files:
+        if file.endswith(".jpg"):
+            tumor_type = os.path.basename(root)
+            file_list.append([os.path.join(root, file), tumor_type])
 
 # Create Gradio interface
 interface = gr.Interface(
     fn=predict_mri,
-    inputs=[gr.Image(type="pil"), gr.Radio(
-        ["Binary Classification", "Multi-class Classification"])],
-    outputs=[gr.Image(type="pil"), gr.Label()],
-    examples=file_list  # Use the list of image paths as examples
+    inputs=gr.Image(type="pil"),
+    outputs=gr.Label(num_top_classes=4),
+    examples=file_list,
+    title="MRI Tumor Classification",
+    description="Upload an MRI image to classify the type of tumor."
 )
 
+# Launch the interface
 interface.launch(share=True)

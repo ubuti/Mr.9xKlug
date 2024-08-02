@@ -7,14 +7,14 @@
 # 
 # This notebook implements this the classification based on this paradigm. Used are multiple pretrained deep neural networks.
 
-# In[61]:
+# In[260]:
 
 
 import gc
 gc.collect()
 
 
-# In[63]:
+# In[261]:
 
 
 import os
@@ -36,12 +36,12 @@ random_image = random.choice(file_list)
 image_path = os.path.join(directory, random_image)
 image = Image.open(image_path)
 plt.imshow(image)
-print(image.mode)
+# print(image.mode)
 plt.axis("off")
 plt.show()
 
 
-# In[65]:
+# In[262]:
 
 
 import pandas as pd
@@ -89,36 +89,8 @@ dataset_1 = pd.DataFrame(
 dataset_2 = pd.DataFrame(
     data_2, columns=["Image_Path", "Dependent_Variable_0123"])
 
-# Display the first few rows of each dataset
-print(dataset_1.head())
-print(dataset_2.head())
 
-
-# In[ ]:
-
-
-import torch
-
-# Create an empty list to store the images
-images = []
-
-# Iterate through the dataset and collect the images
-for image in dataset_1:
-    images.append(image)
-
-# Concatenate the images along the batch dimension
-images = torch.stack(images)
-
-# Calculate the mean and std of the images
-mean = torch.mean(images, dim=(0, 2, 3))
-std = torch.std(images, dim=(0, 2, 3))
-
-# Print the mean and std
-print("Mean:", mean)
-print("Std:", std)
-
-
-# In[70]:
+# In[264]:
 
 
 import torchvision.transforms as transforms
@@ -162,7 +134,6 @@ class BrainTumorDataset(Dataset):
 transform = transforms.Compose([
     transforms.Resize((224, 224)),  # Resize images to 224x224
     transforms.ToTensor(),  # Convert images to PyTorch tensors
-    # Normalize with ImageNet mean and std
     transforms.Normalize(
         mean=[-1.3006, -1.2001, -0.9724], std=[0.8727, 0.8922, 0.8884])
 ])
@@ -176,7 +147,7 @@ btd2 = BrainTumorDataset(data_frame=dataset_2, transform=transform)
 # 
 # Beware that the final fully connected layer has either 2 or 4 neurons depending on which dataset is used. Using 2 neurons corresponds to tumor/no tumor diagnoses, while 4 differentiate between the different conditions of brain tumors.
 
-# In[71]:
+# In[265]:
 
 
 import json
@@ -202,15 +173,24 @@ model.load_state_dict(weights, strict=False)
 print(model)
 
 
-# In[ ]:
+# In[199]:
 
 
+import torch
+import torch.nn as nn
 from torchvision import models
 
-# Define the model (using a pre-trained ResNet18 model as an example)
-model = models.resnet18(weights='IMAGENET1K_V1')
-# Adjust the output layer for binary classification
+# Initialize the model
+model = models.resnet18()
+
+# Modify the final fully connected layer to match the number of classes
 model.fc = nn.Linear(model.fc.in_features, 4)
+
+# Load the state dictionary from the .pt file
+state_dict = torch.load('../Models/resnet18/resnet_mri_010824.pth')
+
+# Load the state dictionary into the model
+model.load_state_dict(state_dict)
 
 
 # ### Training pipeline
@@ -352,7 +332,7 @@ plt.tight_layout()
 plt.show()
 
 
-# In[159]:
+# In[266]:
 
 
 import torch
@@ -547,7 +527,18 @@ plt.show()
 # 
 # Run the following cell to obtain single image classification results.
 
-# In[161]:
+# In[252]:
+
+
+# if no prior training
+# Check if MPS is available
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+print(device)
+
+model.to(device)
+
+
+# In[253]:
 
 
 import torch.nn.functional as F
@@ -581,7 +572,7 @@ def test(model, test_loader, criterion, device):
 test(model, test_loader, criterion, device)
 
 
-# In[162]:
+# In[256]:
 
 
 import numpy as np
@@ -593,8 +584,6 @@ def eval_perform(model, dataset):
     # Pick a random image from the dataset
     idx = random.randint(0, len(dataset) - 1)
     image, label = dataset[idx]
-
-    # Prepare the image for the model
     # Add batch dimension and move to device
     image = image.unsqueeze(0).to(device)
 
@@ -613,29 +602,34 @@ def eval_perform(model, dataset):
     plt.axis('off')
     plt.show()
 
-    return logits, probabilities, label
+    return probabilities, label
 
 # Example usage:
-# logits, probabilities = eval_perform(model, test_dataset, device)
+# logits, probabilities = eval_perform(model, test_dataset)
 # print("Logits:", logits)
 # print("Probabilities:", probabilities)
 
 
-# In[186]:
+# In[257]:
 
 
-logits, probabilities, label = eval_perform(model, test_dataset)
+probabilities, label = eval_perform(model, test_dataset)
 print("Probabilities:", probabilities)
 _, prediction = torch.max(probabilities.data, 1)
 print("Prediction:", int(prediction))
 print("Label:", label)
 
 
-# In[188]:
+# In[254]:
 
 
 # Save model 
-torch.save(model.state_dict(), '../Models/resnet_mri_010824.pth')
+from safetensors.torch import save_file
+
+torch.save(model.state_dict(), '../Models/resnet18/resnet_mri_010824.pth')
+
+# Save the model's state dictionary as a .safetensors file
+save_file(model.state_dict(), '../Models/resnet18/resnet_mri_010824.safetensors')
 
 
 # 
