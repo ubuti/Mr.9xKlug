@@ -14,7 +14,7 @@ This project uses a ResNet18 model to classify MRI images into four categories: 
 
 Try out the model with our interactive demo:
 
-[![Gradio](https://img.shields.io/badge/Gradio-Live%20Demo-blue)](https://fe3d9890bf60d19919.gradio.live)
+[![Gradio](https://img.shields.io/badge/Gradio-Live%20Demo-blue)](https://huggingface.co/spaces/ubuti/MRI_tumor_classification)
 
 
 ### How to Use
