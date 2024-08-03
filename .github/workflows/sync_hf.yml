@@ -31,23 +31,8 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Clone the Hugging Face repository using the 'space' remote
-          git clone https://huggingface.co/ubuti/MRI_tumor_classification hf-repo
+          # Add Hugging Face as a remote
+          git remote add hf https://ubuti:${HF_TOKEN}@huggingface.co/ubuti/MRI_tumor_classification
           
-          # Copy the contents of the GitHub repository to the Hugging Face repository
-          rsync -av --exclude='.git' . hf-repo/
-          
-          # Change to the Hugging Face directory
-          cd hf-repo
-          
-          # Add the 'space' remote to your Hugging Face repo directory
-          git remote add space https://ubuti:${HF_TOKEN}@huggingface.co/ubuti/MRI_tumor_classification
-
-          # Check if there are changes to commit
-          if [ -n "$(git status --porcelain)" ]; then
-            git add .
-            git commit -m "Sync with GitHub"
-            git push space main
-          else
-            echo "No changes to sync."
-          fi
+          # Push changes to the Hugging Face repository
+          git push hf main  # Change 'main' if you're using a different branch
