@@ -5,4 +5,4 @@ pandas==2.2.2
 Pillow==10.4.0
 safetensors==0.4.3
 torch==2.3.1
-torchvision==0.18.1a0
+torchvision==0.18.1
