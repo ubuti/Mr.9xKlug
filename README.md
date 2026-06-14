@@ -19,7 +19,7 @@ Try out the model with our interactive demo:
 
 ### How to Use
 
-1. Click on the "Live Demo" link above.
+1. Click on the *Live Demo* above.
 2. Upload an MRI image or use one of the provided examples.
 3. The model will classify the image and provide probabilities for each tumor type.
 
@@ -29,12 +29,12 @@ If you want to run the model locally:
 
 1. Clone this repository
 2. Install dependencies: `conda env create -f environment.yml`. Alternatively use `pip install requirements.txt`.
-3. Run the Gradio interface: `python/python3 -u app.py`
+3. Run the Gradio interface: `python3 -u app.py`
 
 ### Model Details
 
 - Architecture: torchvision.models.resnet18 was used and initialised with the weights and configuration of [BehradG](https://huggingface.co/BehradG/resnet-18-finetuned-MRI-Brain/tree/main).
-- Training Data: Two datasets available via *kaggle* [1](https://www.kaggle.com/datasets/sartajbhuvaji/brain-tumor-classification-mri) [2](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset) where joined.
+- Training Data: Two datasets available on **kaggle** where merged [1](https://www.kaggle.com/datasets/sartajbhuvaji/brain-tumor-classification-mri), [2](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset).
 - Performance: Model exceeds $97%$ accuracy.
 
 ### Contact
