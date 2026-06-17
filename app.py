@@ -12,7 +12,7 @@ model.fc = nn.Linear(model.fc.in_features, 4)
 
 # Load the state dictionary from the .pt file
 state_dict = torch.load(
-    './Models/resnet18/resnet_mri_010824.pth', map_location=torch.device('cpu'))
+    './Models/resnet18/resnet_mri_062024.pth', map_location=torch.device('cpu'))
 model.load_state_dict(state_dict)
 model.eval()
 
@@ -20,10 +20,24 @@ model.eval()
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 model = model.to(device)
 
-# Define the transformation
+def get_normalize_vals(img_path):
+    """Return the mean and std for a chosen image in order to use Normalize in the transforms method of the dataset."""
+    img = Image.open(img_path)
+    transform = transforms.Compose([transforms.ToTensor()])
+    img_tensor = transform(img)
+    means = torch.mean(img_tensor, dim=[1,2])
+    stds = torch.std(img_tensor, dim=[1,2])
+    return means, stds
+
+path = "./Data/brain_tumor_4variants/Training/glioma_tumor/gg (1).jpg"
+m, s = get_normalize_vals(path)
+
 transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
+    transforms.Resize((224, 224)),  # Resize images to 224x224
+    transforms.ToTensor(),  # Convert images to PyTorch tensors
+    transforms.Normalize(
+        mean=m, std=s),
+    transforms.Lambda(lambda x: torch.clamp(x,0,1))
 ])
 
 
