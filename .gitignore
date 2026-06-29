@@ -1,0 +1,8 @@
+# Ignore model weights and datasets
+Models/
+Data/
+*.pt
+*.safetensors
+*.jpg
+*.jpeg
+*.png
