@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Git LFS
         run: |
@@ -31,9 +33,6 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Use the existing Hugging Face Space remote
           git remote remove hf 2>/dev/null || true
           git remote add hf https://ubuti:${HF_TOKEN}@huggingface.co/spaces/ubuti/MRI_tumor_classification
-
-          # Push changes to the Hugging Face Space
-          git push hf main --force
+          git push hf HEAD:main --force
