@@ -24,8 +24,8 @@ jobs:
 
       - name: Track large files with Git LFS
         run: |
-          git lfs track "Models/resnet18/*.pth"
-          git lfs track "Models/resnet18/*.safetensors"
+          git lfs track "../Models/resnet18/*.pth"
+          git lfs track "../Models/resnet18/*.safetensors"
           git add .gitattributes
           git config --global user.email "simon@roske.com"
           git config --global user.name "ubuti"
