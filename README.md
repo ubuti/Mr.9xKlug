@@ -2,7 +2,7 @@
 title: MRI_tumor_classification
 app_file: app.py
 sdk: gradio
-sdk_version: 4.40.0
+sdk_version: 6.14.0
 ---
 # Mr.9xKlug
 
@@ -28,7 +28,7 @@ Try out the model with our interactive demo:
 If you want to run the model locally:
 
 1. Clone this repository
-2. Install dependencies: `conda env create -f environment.yml`. Alternatively use `pip install requirements.txt`.
+2. Install dependencies: `conda env create -f environment.yml`.
 3. Run the Gradio interface: `python3 -u app.py`
 
 ### Model Details
