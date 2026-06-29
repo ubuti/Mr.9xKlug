@@ -1,3 +1,3 @@
-# Track all .pth and .safetensors files in Models/resnet18 with Git LFS
+# Track all .pth and .safetensors files in Models/resnet18 with git LFS
 Models/resnet18/*.pth filter=lfs diff=lfs merge=lfs -text
 Models/resnet18/*.safetensors filter=lfs diff=lfs merge=lfs -text
