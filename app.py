@@ -15,7 +15,7 @@ model.fc = nn.Linear(model.fc.in_features, 4)
 
 # Load the state dictionary from the .pt file
 state_dict = torch.load(
-    './Models/resnet18/ResNet_mri__62026.pth', map_location=torch.device('cpu'))
+    './Models/resnet18/ResNet_mri__62026.pth', map_location=torch.device('cpu'), weights_only=False)
 model.load_state_dict(state_dict)
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 model = model.to(device)
