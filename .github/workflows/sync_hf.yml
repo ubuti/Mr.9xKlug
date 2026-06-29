@@ -24,12 +24,18 @@ jobs:
 
       - name: Track large files with Git LFS
         run: |
-          git lfs track "../Models/resnet18/*.pth"
-          git lfs track "../Models/resnet18/*.safetensors"
+          git lfs track "Models/resnet18/*.pth"
+          git lfs track "Models/resnet18/*.safetensors"
           git add .gitattributes
           git config --global user.email "simon@roske.com"
           git config --global user.name "ubuti"
           git commit -m "Track model files with Git LFS" || true
+
+      - name: Migrate existing large files to LFS
+        run: |
+          git lfs migrate import --above=10MB --everything
+          git add .
+          git commit -m "Migrate large files to LFS" || true
 
       - name: Install huggingface-hub
         run: pip install huggingface-hub
