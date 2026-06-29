@@ -18,11 +18,19 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Install Gradio
-      run: python -m pip install gradio
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install gradio torch torchvision pandas pillow
+
+    - name: Install project dependencies
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Log in to Hugging Face
-      run: python -c 'import huggingface_hub; huggingface_hub.login(token="${{ secrets.hf_token }}")'
+      run: python -c 'import huggingface_hub; huggingface_hub.login(token="${{ secrets.HF_TOKEN }}")'
 
     - name: Deploy to Spaces
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: gradio deploy

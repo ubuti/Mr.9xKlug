@@ -31,8 +31,9 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Add Hugging Face as a remote
+          # Add Hugging Face as a remote (or update if it exists)
+          git remote remove hf 2>/dev/null || true
           git remote add hf https://ubuti:${HF_TOKEN}@huggingface.co/ubuti/MRI_tumor_classification
           
           # Push changes to the Hugging Face repository
-          git push hf main  # Change 'main' if you're using a different branch
+          git push hf main --force  # Change 'main' if you're using a different branch
